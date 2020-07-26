@@ -6,6 +6,7 @@ fRenderDelta = 0.0
 sOperatingSystem = ''
 fFPSAvg = 0.0
 totalFrames = 0
+hx, hy, hz = 0.0, 0.0, 0.0
 
 m = lovr.filesystem.load('src/lib.lua'); m()
 
@@ -45,7 +46,7 @@ function lovr.update(dT)
     end
 
     -- Light position updates
-    shader:send('lightPos', { 0.0, -1.0, -3.0 })
+    shader:send('lightPos', { 2.0, 5.0, 0.0 })
 
     -- Adjust head position (for specular)
     if lovr.headset then 
@@ -56,10 +57,29 @@ end
 
 function lovr.draw()
     lovr.graphics.setShader(shader)
-
+    --ground
+    lovr.graphics.setColor(0.2, 0.6, 0.2, 1.0)
+    shader:send('metallic', 1)
+    shader:send('specularStrength', 0.1)
+    lovr.graphics.box('fill', 0.0, -2.0, 0.0, 15.0, 0.1, 15.0, 0.0)
+    
     lovr.graphics.setShader() -- Reset to default/unlit
+    -- skybox
+    lovr.graphics.setColor(0.2, 0.3, 0.7, 1.0)
+    lovr.graphics.cube('fill', hx, hy, hz, 100.0, 0.0)
+    
+    
+    -- reset color/shader variables
     lovr.graphics.setColor(1, 1, 1, 1)
+    shader:send('metallic', 32)
+    shader:send('specularStrength', 0.25)
+    
     lovr.graphics.print('hello world', 0, 2, -3, .5)
+    -- light
+    lovr.graphics.sphere(2, 5, 0, 0.1)
+
+    lovr.graphics.setShader()
+
     if debug.showFrameDelta then 
         fRenderDelta = os.clock() - fRenderDelta 
         print('frame render time', fRenderDelta)
